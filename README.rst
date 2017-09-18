@@ -10,7 +10,7 @@ wavelet
         :target: https://travis-ci.org/paulthebaker/wavelet
 
 .. image:: https://readthedocs.org/projects/wavelet/badge/?version=latest
-        :target: https://wavelet.readthedocs.io/en/latest/?badge=latest
+        :target: https://ptbwavelet.readthedocs.io/en/latest/?badge=latest
         :alt: Documentation Status
 
 .. image:: https://pyup.io/repos/github/paulthebaker/wavelet/shield.svg
@@ -22,7 +22,7 @@ a minimal continuous wavelet transform module in python.
 
 
 * Free software: MIT license
-* Documentation: https://wavelet.readthedocs.io.
+* Documentation: https://ptbwavelet.readthedocs.io.
 
 
 Features
