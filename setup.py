@@ -28,7 +28,7 @@ test_requirements = [
 
 setup(
     name='wavelet',
-    version='0.0.0',
+    version='0.1.0',
     description="a minimal continuous wavelet transform module",
     long_description=readme + '\n\n' + history,
     author="Paul T. Baker",
