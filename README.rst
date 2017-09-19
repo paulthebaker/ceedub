@@ -18,22 +18,27 @@ wavelet
      :alt: Updates
 
 
-a minimal continuous wavelet transform module in python.
+A minimal continuous wavelet transform module in python.
 
 
 * Free software: MIT license
 * Documentation: https://ptbwavelet.readthedocs.io.
 
 
+Not yet in PyPI.  To install with `pip` directly from github run:
+
+```pip install git+https://github.com/paulthebaker/wavelet@master```
+
 Features
 --------
 
 * continuous wavelet transforms in python
-* arbitrary user defined wavelet basis functions
- * provides Morlet-Gabor and Paul wavelets
+* arbitrary user defined wavelet basis functions (provides Morlet-Gabor and Paul wavelets)
 
 Credits
 ---------
+
+Copyright (c) 2017 Paul T. Baker
 
 This package was created with Cookiecutter_ and the `audreyr/cookiecutter-pypackage`_ project template.
 
