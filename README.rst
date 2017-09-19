@@ -9,7 +9,7 @@ wavelet
 .. image:: https://img.shields.io/travis/paulthebaker/wavelet.svg
         :target: https://travis-ci.org/paulthebaker/wavelet
 
-.. image:: https://readthedocs.org/projects/wavelet/badge/?version=latest
+.. image:: https://readthedocs.org/projects/ptbwavelet/badge/?version=latest
         :target: https://ptbwavelet.readthedocs.io/en/latest/?badge=latest
         :alt: Documentation Status
 
@@ -30,7 +30,7 @@ Features
 
 * continuous wavelet transforms in python
 * arbitrary user defined wavelet basis functions
-  * provides Morlet-Gabor and Paul wavelets
+ * provides Morlet-Gabor and Paul wavelets
 
 Credits
 ---------
