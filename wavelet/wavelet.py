@@ -6,7 +6,8 @@ based on Torrence and Compo 1998 (T&C)
 (http://paos.colorado.edu/research/wavelets/bams_79_01_0061.pdf)
 """
 
-from __future__ import division, print_function
+from __future__ import (absolute_import, division,
+                        print_function, unicode_literals)
 
 import numpy as np
 
