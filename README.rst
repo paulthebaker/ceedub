@@ -1,12 +1,11 @@
 =======
 wavelet
 =======
-.. image:: https://img.shields.io/badge/python-2.7-blue.svg
-        :alt: Python27
-.. image:: https://img.shields.io/badge/python-3.5-blue.svg
-        :alt: Python35
-.. image:: https://img.shields.io/badge/python-3.6-blue.svg
-        :alt: Python36
+|py27| |py35| |py36|
+
+.. |py27| image:: https://img.shields.io/badge/python-2.7-blue.svg
+.. |py35| image:: https://img.shields.io/badge/python-3.5-blue.svg
+.. |py36| image:: https://img.shields.io/badge/python-3.6-blue.svg
 
 .. image:: https://img.shields.io/pypi/v/wavelet.svg
         :target: https://pypi.python.org/pypi/wavelet
