@@ -3,14 +3,10 @@ wavelet
 =======
 .. image:: https://img.shields.io/badge/python-2.7-blue.svg
         :alt: Python27
-
 .. image:: https://img.shields.io/badge/python-3.5-blue.svg
         :alt: Python35
-
 .. image:: https://img.shields.io/badge/python-3.6-blue.svg
         :alt: Python36
-
-<br>
 
 .. image:: https://img.shields.io/pypi/v/wavelet.svg
         :target: https://pypi.python.org/pypi/wavelet
