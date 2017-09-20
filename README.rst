@@ -31,9 +31,9 @@ A minimal continuous wavelet transform module in python.
 * Documentation: https://ptbwavelet.readthedocs.io.
 
 
-Not yet in PyPI.  To install with `pip` directly from github run:
+Not yet in PyPI.  To install with ``pip`` directly from github run:
 
-`pip install git+https://github.com/paulthebaker/wavelet@master`
+``pip install git+https://github.com/paulthebaker/wavelet@master``
 
 Features
 --------
