@@ -8,11 +8,11 @@ Installation
 Stable release
 --------------
 
-To install wavelet, run this command in your terminal:
+To install ``wavelet``, run this command in your terminal:
 
 .. code-block:: console
 
-    $ pip install wavelet
+    $ pip install git+https://github.com/paulthebaker/wavelet@master
 
 This is the preferred method to install wavelet, as it will always install the most recent stable release. 
 
