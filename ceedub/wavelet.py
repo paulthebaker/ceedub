@@ -18,7 +18,7 @@ _SQRT2 = np.sqrt(2.)
 
 
 def cwt(tdat, dt=1):
-    """Compute the continuous wavelet transform, using the default 
+    """Compute the continuous wavelet transform, using the default
     ``WaveletBasis``.
     If you plan on doing several CWTs in the same basis you should
     consider initializing a ``WaveletBasis`` object and using:
