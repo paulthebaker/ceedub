@@ -67,7 +67,7 @@ class WaveletBasis(object):
             The second is the scale or width parameter.  The wavelet
             function should be normalized to unit weight at scale=1, and
             have zero mean.
-        :param N: length of time domain data
+        :param N: length of time domain data that will be transformed
         :param dt: sample cadence of data, needed for normalization
             of transforms
         :param dj: scale step size, used to determine the scales for
@@ -155,11 +155,10 @@ class WaveletBasis(object):
         at each wavelet scale, determining the frequecny resolution of
         the output.
 
-        :param tdat: 1d array of real, time domain data. ``tdat`` must
-            have length ``N``.
-        :return wdat: 2d array of complex, wavelet domain data. ``wdat``
-            has shape (M,N), where ``M`` is the number of scales used
-            in the transform.
+        :param tdat: shape ``(N,)`` array of real, time domain data
+        :return wdat: shape ``(M,N)`` array of complex, wavelet domain data.
+            ``M`` is the number of scales used in the transform, and ``N`` is
+            the length of the input time domain data.
         """
         if len(tdat) != self.N:
             raise ValueError("tdat is not length N={:d}".format(self.N))
@@ -190,9 +189,10 @@ class WaveletBasis(object):
         following T&Compo section 3.i.  Uses the wavelet function and
         scales of the parent WaveletBasis.
 
-        :param wdat: shape (M,N) wavelet domain data, for M frequency
-            scales and N time samples
-        :return tdat: length N 1d array of real, time domain data
+        :param wdat: shape ``(M,N)`` array of complex, wavelet domain data.
+            ``M`` is the number of frequency scales, and ``N`` is the number of
+            time samples.
+        :return tdat: shape ``(N,)`` array of real, time domain data
         """
         if not hasattr(self, '_recon_norm'):
             self._recon_norm = self._get_recon_norm()
