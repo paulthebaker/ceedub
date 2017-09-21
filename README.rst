@@ -1,39 +1,39 @@
-=======
-wavelet
-=======
+============
+ceedub (C-W)
+============
 |py27| |py35| |py36|
 
 .. |py27| image:: https://img.shields.io/badge/python-2.7-blue.svg
 .. |py35| image:: https://img.shields.io/badge/python-3.5-blue.svg
 .. |py36| image:: https://img.shields.io/badge/python-3.6-blue.svg
 
-.. image:: https://img.shields.io/pypi/v/wavelet.svg
-        :target: https://pypi.python.org/pypi/wavelet
+.. image:: https://img.shields.io/pypi/v/ceedub.svg
+        :target: https://pypi.python.org/pypi/ceedub
         :alt: PyPI status
 
-.. image:: https://img.shields.io/travis/paulthebaker/wavelet.svg
-        :target: https://travis-ci.org/paulthebaker/wavelet
+.. image:: https://img.shields.io/travis/paulthebaker/ceedub.svg
+        :target: https://travis-ci.org/paulthebaker/ceedub
         :alt: Build Status
 
-.. image:: https://readthedocs.org/projects/ptbwavelet/badge/?version=latest
-        :target: https://ptbwavelet.readthedocs.io/en/latest/?badge=latest
+.. image:: https://readthedocs.org/projects/ceedub/badge/?version=latest
+        :target: https://ceedub.readthedocs.io/en/latest/?badge=latest
         :alt: Documentation Status
 
-.. image:: https://pyup.io/repos/github/paulthebaker/wavelet/shield.svg
-     :target: https://pyup.io/repos/github/paulthebaker/wavelet/
+.. image:: https://pyup.io/repos/github/paulthebaker/ceedub/shield.svg
+     :target: https://pyup.io/repos/github/paulthebaker/ceedub/
      :alt: Developement Tool Updates
 
 
-A minimal continuous wavelet transform module in python.
+An awesome, easy to use continuous wavelet transform module in for python!
 
 
 * Free software: MIT license
-* Documentation: https://ptbwavelet.readthedocs.io.
+* Documentation: https://ceedub.readthedocs.io.
 
 
 Not yet in PyPI.  To install with ``pip`` directly from github run:
 
-``pip install git+https://github.com/paulthebaker/wavelet@master``
+``pip install git+https://github.com/paulthebaker/ceedub@master``
 
 Features
 --------
