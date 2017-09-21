@@ -25,19 +25,19 @@ test_requirements = [
 ]
 
 setup(
-    name='wavelet',
+    name='ceedub',
     version='0.1.0',
-    description="a minimal continuous wavelet transform module",
+    description="(C-W) an awesome and simple continuous wavelet transform module",
     long_description=readme + '\n\n' + history,
     author="Paul T. Baker",
     author_email='paultbaker@gmail.com',
-    url='https://github.com/paulthebaker/wavelet',
-    packages=find_packages(include=['wavelet']),
+    url='https://github.com/paulthebaker/ceedub',
+    packages=find_packages(include=['ceedub']),
     include_package_data=True,
     install_requires=requirements,
     license="MIT license",
     zip_safe=False,
-    keywords='wavelet',
+    keywords='cwt, wavelet',
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',
