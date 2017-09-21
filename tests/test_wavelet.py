@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""Tests for `wavelet` package."""
+"""Tests for `ceedub` package."""
 
 from __future__ import division, print_function
 
 import pytest
 
 import numpy as np
-from wavelet import wavelet as w
+import ceedub as cw
 
 
 @pytest.fixture
@@ -32,6 +32,6 @@ def test_Morlet():
     Psi_t(0) = pi^(-1/4)
     Psi_f(0) = 0
     """
-    morl = w.MorletWave()
+    morl = cw.MorletWave()
     assert(np.isclose(morl(0), np.pi**(-1/4), atol=1.e-12))
     assert(np.isclose(morl.freq(0), 0, atol=1.e-12))

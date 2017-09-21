@@ -2,6 +2,6 @@
 Usage
 =====
 
-To use wavelet in a project::
+To use ``ceedub`` in a project::
 
-    import wavelet
+    import ceedub
