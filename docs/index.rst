@@ -1,4 +1,4 @@
-Welcome to wavelet's documentation!
+Welcome to ceedub's documentation!
 ======================================
 
 Contents:
