@@ -17,6 +17,40 @@ from scipy.special import gamma as _gam
 _SQRT2 = np.sqrt(2.)
 
 
+def cwt(tdat, dt=1):
+    """Compute the continuous wavelet transform, using the default 
+    ``WaveletBasis``.
+    If you plan on doing several CWTs in the same basis you should
+    consider initializing a ``WaveletBasis`` object and using:
+    ``WaveletBasis.cwt``.
+    :param tdat: shape ``(N,)`` array of real, time domain data
+    :param dt: sample cadence of data, needed for normalization
+        of transforms
+    :return wdat: shape ``(M,N)`` array of complex, wavelet domain data.
+        ``M`` is the number of scales used in the transform, and ``N`` is
+        the length of the input time domain data.
+    """
+    WB = WaveletBasis(N=len(tdat), dt=dt)
+    return WB.cwt(tdat)
+
+
+def icwt(wdat, dt=1):
+    """Compute the inverse continuous wavelet transform, using the default
+    WaveletBasis.
+    If the forward transform was performed in a different basis, then this
+    function will give incorrect output!
+    If you plan on doing several ICWTs in the same basis you should seriously
+    consider initializing a ``WaveletBasis`` object and using:
+    ``WaveletBasis.cwt`` and WaveletBasis.icwt``.
+    :param wdat: shape ``(M,N)`` array of complex, wavelet domain data.
+        ``M`` is the number of frequency scales, and ``N`` is the number of
+        time samples.
+    :return tdat: shape ``(N,)`` array of real, time domain data
+    """
+    WB = WaveletBasis(N=wdat.shape[1], dt=dt)
+    return WB.icwt(wdat)
+
+
 class WaveletBasis(object):
     """An object setting up a CWT basis for forward and inverse transforms
     of data using the same sample rate and frequency scales.  At
