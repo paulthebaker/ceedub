@@ -23,5 +23,5 @@ deploy:
     secure: PLEASE_REPLACE_ME
   on:
     tags: true
-    repo: paulthebaker/wavelet
+    repo: paulthebaker/ceedub
     python: 3.5
