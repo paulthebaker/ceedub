@@ -26,7 +26,7 @@ def cwt(tdat, dt=1):
     :param tdat: shape ``(N,)`` array of real, time domain data
     :param dt: sample cadence of data, needed for normalization
         of transforms
-    :return wdat: shape ``(M,N)`` array of complex, wavelet domain data.
+    :returns: wdat shape ``(M,N)`` array of complex, wavelet domain data.
         ``M`` is the number of scales used in the transform, and ``N`` is
         the length of the input time domain data.
     """
@@ -36,7 +36,7 @@ def cwt(tdat, dt=1):
 
 def icwt(wdat, dt=1):
     """Compute the inverse continuous wavelet transform, using the default
-    WaveletBasis.
+    ``WaveletBasis``.
     If the forward transform was performed in a different basis, then this
     function will give incorrect output!
     If you plan on doing several ICWTs in the same basis you should seriously
@@ -45,10 +45,22 @@ def icwt(wdat, dt=1):
     :param wdat: shape ``(M,N)`` array of complex, wavelet domain data.
         ``M`` is the number of frequency scales, and ``N`` is the number of
         time samples.
-    :return tdat: shape ``(N,)`` array of real, time domain data
+    :returns: tdat shape ``(N,)`` array of real, time domain data
     """
     WB = WaveletBasis(N=wdat.shape[1], dt=dt)
     return WB.icwt(wdat)
+
+
+def cwtfreq(N, dt=1):
+    """Output the Fourier frequencies of the scales used in the default
+    ``WaveletBasis``.
+
+    :param N: number of time samples in the time domain data.
+    :param dt: sample cadence of data
+    returns: shape ``(M,)`` array of frequencies
+    """
+    WB = WaveletBasis(N=N, dt=dt)
+    return WB.freqs
 
 
 class WaveletBasis(object):
@@ -156,7 +168,7 @@ class WaveletBasis(object):
         the output.
 
         :param tdat: shape ``(N,)`` array of real, time domain data
-        :return wdat: shape ``(M,N)`` array of complex, wavelet domain data.
+        :returns: wdat shape ``(M,N)`` array of complex, wavelet domain data.
             ``M`` is the number of scales used in the transform, and ``N`` is
             the length of the input time domain data.
         """
@@ -186,13 +198,13 @@ class WaveletBasis(object):
     def icwt(self, wdat):
         """icwt(wdat)
         Coputes the inverse continuous wavelet transform of ``wdat``,
-        following T&Compo section 3.i.  Uses the wavelet function and
-        scales of the parent WaveletBasis.
+        following T&C section 3.i.  Uses the wavelet function and scales
+        of the parent WaveletBasis.
 
         :param wdat: shape ``(M,N)`` array of complex, wavelet domain data.
             ``M`` is the number of frequency scales, and ``N`` is the number of
             time samples.
-        :return tdat: shape ``(N,)`` array of real, time domain data
+        :returns: tdat shape ``(N,)`` array of real, time domain data
         """
         if not hasattr(self, '_recon_norm'):
             self._recon_norm = self._get_recon_norm()
@@ -214,7 +226,7 @@ class WaveletBasis(object):
             s_j = s0 * 2**(j*dj), j in [0,J]
             J = log2(N) / dj
 
-        :return scales: array of scale parameters, s, for use in ``cwt``
+        :returns: scales array of scale parameters, s, for use in ``cwt``
 
         If the wavelet used contains a ``nyquist_scale()`` method, then
         the smallest scale will correspond to the Nyquist frequency and
@@ -276,6 +288,7 @@ class MorletWave(object):
     def time(self, t, s=1.0):
         """
         Time domain complex Morlet wavelet, centered at zero.
+
         :param t: time
         :param s: scale factor
         :return psi: value of complex morlet wavelet at time, t
@@ -368,7 +381,7 @@ class PaulWave(object):
         Time domain complex Paul wavelet, centered at zero.
         :param t: time
         :param s: scale factor
-        :return psi: value of complex Paul wavelet at time, t
+        :returns psi: value of complex Paul wavelet at time, t
 
         The wavelets are defined by dimensionless time: x = t/s
 
@@ -402,7 +415,7 @@ class PaulWave(object):
         Note that the complex Paul wavelet is real in the frequency domain.
         :param w: frequency
         :param s: scale factor
-        :return psi: value of morlet wavelet at frequency, w
+        :returns psi: value of morlet wavelet at frequency, w
 
         wavelets are defined by dimensionless frequency: y = w*s
 
