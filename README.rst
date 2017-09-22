@@ -30,8 +30,11 @@ An awesome, simple, and easy to use continuous wavelet transform package for pyt
 * Free software: MIT license
 * Documentation: https://ceedub.readthedocs.io.
 
+To install the latest stable release ``v0.1.0 -- alpha`` from PyPI run:
 
-Not yet in PyPI.  To install with ``pip`` directly from github run:
+``pip install ceedub``
+
+To install the most current version with ``pip`` directly from github run:
 
 ``pip install git+https://github.com/paulthebaker/ceedub@master``
 
