@@ -43,6 +43,9 @@ Features
 
 * continuous wavelet transforms (forward and inverse) in python
 * arbitrary user defined wavelet basis functions (provides Morlet-Gabor and Paul wavelets)
+* follows the conventions of Torrence and Compo [T&C1998]_.
+
+.. [T&C1998] https://doi.org/10.1175/1520-0477(1998)079<0061:APGTWA>2.0.CO;2
 
 Credits
 ---------
