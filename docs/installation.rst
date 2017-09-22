@@ -8,11 +8,11 @@ Installation
 Stable release
 --------------
 
-To install ``ceedub``, run this command in your terminal:
+To install the ``ceedub``, run this command in your terminal:
 
 .. code-block:: console
 
-    $ pip install git+https://github.com/paulthebaker/ceedub@master
+    $ pip install ceedub
 
 This is the preferred method to install ``ceedub``, as it will always install the most recent stable release. 
 

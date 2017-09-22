@@ -30,8 +30,11 @@ An awesome, simple, and easy to use continuous wavelet transform package for pyt
 * Free software: MIT license
 * Documentation: https://ceedub.readthedocs.io.
 
+To install the latest stable release ``v0.1.0 -- alpha`` from PyPI run:
 
-Not yet in PyPI.  To install with ``pip`` directly from github run:
+``pip install ceedub``
+
+To install the most current version with ``pip`` directly from github run:
 
 ``pip install git+https://github.com/paulthebaker/ceedub@master``
 
@@ -40,6 +43,9 @@ Features
 
 * continuous wavelet transforms (forward and inverse) in python
 * arbitrary user defined wavelet basis functions (provides Morlet-Gabor and Paul wavelets)
+* follows the conventions of Torrence and Compo [T&C1998]_.
+
+.. [T&C1998] https://doi.org/10.1175/1520-0477(1998)079<0061:APGTWA>2.0.CO;2
 
 Credits
 ---------
