@@ -1,5 +1,5 @@
-* wavelet version:
-* Python version:
+* `ceedub` version:
+* `Python` version:
 * Operating System:
 
 ### Description
