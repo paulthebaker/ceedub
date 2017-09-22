@@ -32,7 +32,6 @@ setup(
     author="Paul T. Baker",
     author_email='paultbaker@gmail.com',
     url='https://github.com/paulthebaker/ceedub',
-    download_url = 'https://github.com/paulthebaker/ceedub/archive/',
     packages=find_packages(include=['ceedub']),
     include_package_data=True,
     install_requires=requirements,
