@@ -1,6 +1,6 @@
-============
-ceedub (C-W)
-============
+======
+ceedub
+======
 |py27| |py35| |py36|
 
 .. |py27| image:: https://img.shields.io/badge/python-2.7-blue.svg
@@ -24,7 +24,7 @@ ceedub (C-W)
      :alt: Developement Tool Updates
 
 
-An awesome, easy to use continuous wavelet transform module in for python!
+An awesome, simple, and easy to use continuous wavelet transform package for python!
 
 
 * Free software: MIT license

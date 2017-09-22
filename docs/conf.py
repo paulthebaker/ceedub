@@ -258,7 +258,7 @@ texinfo_documents = [
      u'ceedub Documentation',
      u'Paul T. Baker',
      'ceedub',
-     '(C-W) a simple and awesome continuous wavelet transform module',
+     '(CW) an awesome and simple continuous wavelet transform',
      'Miscellaneous'),
 ]
 
