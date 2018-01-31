@@ -41,7 +41,7 @@ def icwt(wdat, dt=1):
     function will give incorrect output!
     If you plan on doing several ICWTs in the same basis you should seriously
     consider initializing a ``WaveletBasis`` object and using:
-    ``WaveletBasis.cwt`` and WaveletBasis.icwt``.
+    ``WaveletBasis.cwt`` and ``WaveletBasis.icwt``.
     :param wdat: shape ``(M,N)`` array of complex, wavelet domain data.
         ``M`` is the number of frequency scales, and ``N`` is the number of
         time samples.
