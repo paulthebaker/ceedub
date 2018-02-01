@@ -4,18 +4,18 @@ ceedub package
 Submodules
 ----------
 
-ceedub\.easy module
--------------------
+ceedub\.basis module
+--------------------
 
-.. automodule:: ceedub.easy
+.. automodule:: ceedub.basis
     :members:
     :undoc-members:
     :show-inheritance:
 
-ceedub\.transform module
-------------------------
+ceedub\.easy module
+-------------------
 
-.. automodule:: ceedub.transform
+.. automodule:: ceedub.easy
     :members:
     :undoc-members:
     :show-inheritance:
