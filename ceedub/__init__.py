@@ -8,7 +8,7 @@ based on Torrence and Compo 1998 (T&C)
 
 from .easy import cwt, icwt, cwtfreq
 from .wavelet import MorletWave, PaulWave
-from .transform import WaveletBasis
+from .basis import WaveletBasis
 
 __author__ = """Paul T. Baker"""
 __email__ = 'paultbaker@gmail.com'
