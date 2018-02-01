@@ -108,10 +108,10 @@ class MorletWave(object):
         r"""compute the scale factor corresponding to the Nyquist period
 
         :param dt:
-            sampling time of wavelet basis (time between samples)
+            sample cadence of wavelet basis (time between samples)
 
         For wavelet basis defined by the mother wavelet with width,
-        :math:`w_0`, and a sampling time, :math:`dt`, the Nyquist period
+        :math:`w_0`, and a sample cadence, :math:`dt`, the Nyquist period
         is the smallest period (largest frequency) which can be resolved.
         For a Morlet wavelet this is
 
