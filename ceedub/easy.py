@@ -7,6 +7,7 @@ from __future__ import (absolute_import, division,
 
 from .transform import WaveletBasis
 
+
 def cwt(tdat, dt=1):
     """Compute the continuous wavelet transform, using the default
     ``WaveletBasis``.

@@ -10,6 +10,7 @@ import numpy as np
 from scipy.signal import fftconvolve as _fftconv
 from .wavelet import MorletWave
 
+
 class WaveletBasis(object):
     """An object setting up a CWT basis for forward and inverse transforms
     of data using the same sample rate and frequency scales.  At

@@ -106,7 +106,7 @@ class MorletWave(object):
 
     def nyquist_scale(self, dt=1):
         r"""compute the scale factor corresponding to the Nyquist period
-        
+
         :param dt:
             sampling time of wavelet basis (time between samples)
 
