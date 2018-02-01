@@ -4,6 +4,22 @@ ceedub package
 Submodules
 ----------
 
+ceedub\.easy module
+-------------------
+
+.. automodule:: ceedub.easy
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+ceedub\.transform module
+------------------------
+
+.. automodule:: ceedub.transform
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 ceedub\.wavelet module
 ----------------------
 
