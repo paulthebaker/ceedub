@@ -12,9 +12,13 @@ from scipy.special import gamma as _gam
 _SQRT2 = np.sqrt(2.)
 
 
+class Wavelet(object):
+    """base class for wavelet objects
     """
+    def __call__(self, *args, **kwargs):
         """
         """
+        return self.time(*args, **kwargs)
 
 
 class MorletWave(object):
