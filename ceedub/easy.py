@@ -61,7 +61,7 @@ def cwtfreq(N, dt=1):
     :param dt:
         sample cadence of data
 
-    return freqs:
+    :return freqs:
         shape ``(M,)`` array of frequencies
     """
     WB = WaveletBasis(N=N, dt=dt)

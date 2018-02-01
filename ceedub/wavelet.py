@@ -167,6 +167,12 @@ class MorletWave(object):
     def e_fold(self, s):
         r"""The e-folding time for the Morlet wavelet.  In dimensionless
         units of time this is :math:`\sqrt{2}\cdot s`.
+
+        :param s:
+            scale factor of wavelet
+
+        :return tfold:
+            the e-folding time in dimensionless units
         """
         return _SQRT2 * s
 
