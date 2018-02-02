@@ -1,6 +1,11 @@
 ceedub package
 ==============
 
+.. automodule:: ceedub
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 Submodules
 ----------
 
@@ -29,10 +34,3 @@ ceedub\.wavelet module
     :show-inheritance:
 
 
-Module contents
----------------
-
-.. automodule:: ceedub
-    :members:
-    :undoc-members:
-    :show-inheritance:
