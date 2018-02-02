@@ -127,7 +127,8 @@ class MorletWave(object):
         r"""Frequency domain representation of Morlet wavelet
 
         :param w:
-            frequency or list of frequencies to calculate wavelet
+            frequency :math:`\omega` or list of frequencies to calculate
+            wavelet
         :param s:
             scale factor
 
@@ -135,12 +136,12 @@ class MorletWave(object):
             value of morlet wavelet at frequency
 
         The wavelets are defined by dimensionless frequency:
-        :math:`y = w\cdot s`.  The complex Morlet wavelet is real
+        :math:`y = \omega\cdot s`.  The complex Morlet wavelet is real
         in the frequency domain.  The standard Morlet wavelet is
         defined in the frequency domain as:
 
         .. math::
-            \psi(y) = \pi^{-1/4}\, \mathcal{H}(y)\,
+            \bar\psi(y) = \pi^{-1/4}\, \mathcal{H}(y)\,
                 \exp\left(-\frac{(y-w_0)^2}{2}\right)
 
         where :math:`\mathcal{H}(y)` is the Heaviside step function:
@@ -179,13 +180,18 @@ class MorletWave(object):
 
 class PaulWave(object):
     """Paul wavelet of order m.
-    By definition m is an integer, however in this implementation
-    gamma functions are used in place of factorials, so non-integer
-    values of m won't cause errors.
+
+    By definition ``m`` is an integer,
+    however this implementation uses gamma functions in place
+    of factorials, so non-integer values of ``m`` won't cause erros.
     """
 
     def __init__(self, m=4):
-        """ initialize Paul wavelet of order m.
+        """initialize Paul wavelet
+
+        :param m:
+            wavelet order which defines width and base frequency of
+            mother wavelet.
         """
         self.m = m
 
@@ -194,15 +200,23 @@ class PaulWave(object):
         return self.time(*args, **kwargs)
 
     def time(self, t, s=1.0):
-        """
+        r"""
         Time domain complex Paul wavelet, centered at zero.
-        :param t: time
-        :param s: scale factor
-        :returns psi: value of complex Paul wavelet at time, t
 
-        The wavelets are defined by dimensionless time: x = t/s
+        :param t:
+            time or list of times to calculate wavelet
+        :param s:
+            scale factor of wavelet (defines which frequency scale)
 
-            psi(x) = (2*1j)**m * m! / (pi*(2m)!) * (1 - 1j*x)**-(m+1)
+        :return psi:
+            value of complex Paul wavelet at given times
+
+        The wavelets are defined by dimensionless time: :math:`x = t/s`.
+
+        .. math::
+            \psi(x) = \frac{(2i)^m \cdot m!}{\pi\cdot (2m)!}
+                \cdot (1 - ix)^{-(m+1)}
+
         """
         t = np.asarray(t)
         m = self.m
@@ -213,34 +227,71 @@ class PaulWave(object):
         return psi
 
     def fourier_period(self, s):
-        """The Fourier period of the Paul wavelet given by:
-            P = 4*pi*s / (2*m + 1)
+        r"""compute Fourier period of the Paul wavelet
+
+        :param s:
+            scale factor of wavelet
+
+        :return period:
+            period of wavelet
+
+        For a wavelet with scale, :math:`s`, the period is:
+
+        .. math:: P = \frac{4\pi\, s}{2m + 1}
         """
         m = self.m
         return 4*np.pi*s / (2*m + 1)
 
     def nyquist_scale(self, dt=1):
-        """s0 corresponding to the Nyquist period of wavelet
-            s0 = 2*dt (2*m + 1)/(4*pi)
+        r"""compute the scale factor corresponding to the Nyquist period
+
+        :param dt:
+            sample cadence of wavelet basis (time between samples)
+
+        For wavelet basis defined by the mother wavelet of order,
+        :math:`m`, and a sample cadence, :math:`dt`, the Nyquist period
+        is the smallest period (largest frequency) which can be resolved.
+        For a Paul wavelet this is
+
+        .. math:: s_0 = 2\,dt\, \frac{2m + 1}{4\pi}
+        
+        for large :math:`m` this is approximately
+        :math:`dt\cdot m/\pi`.
         """
         m = self.m
         return dt * (2*m+1)/(2*np.pi)
 
     def freq(self, w, s=1.0):
-        """
-        Frequency domain representation of Paul wavelet
-        Note that the complex Paul wavelet is real in the frequency domain.
-        :param w: frequency
-        :param s: scale factor
-        :returns psi: value of morlet wavelet at frequency, w
+        r"""Frequency domain representation of Paul wavelet
 
-        wavelets are defined by dimensionless frequency: y = w*s
+        :param w:
+            frequency :math:`\omega` or list of frequencies to calculate
+            wavelet
+        :param s:
+            scale factor
 
-        The Paul wavelet is computed as:
-            psi(y) = 2**m / np.sqrt(m * (2*m-1)!) * H(y) * (y)**m * exp(-y)
+        :return psi:
+            value of morlet wavelet at frequency
 
-        where H(y) is the Heaviside step function:
-            H(y) = (y > 0) ? 1:0
+        The wavelets are defined by dimensionless frequency:
+        :math:`y = \omega\cdot s`.  The complex Paul wavelet is real
+        in the frequency domain.  The standard Paul wavelet is
+        defined in the frequency domain as:
+
+        .. math::
+            \bar\psi(y) = \frac{2^m}{\sqrt{m\cdot (2m-1)!}}\,
+                H(y)\, y^m\, \exp(-y)
+
+        where :math:`\mathcal{H}(y)` is the Heaviside step function:
+
+        .. math::
+            \mathcal{H}(y) =
+                \Biggl \lbrace
+                {
+                1, \text{ for } y \gt 0
+                \atop
+                0, \text{ for } y \le 0
+                }
         """
         w = np.asarray(w)
         H = np.zeros_like(w)  # Heaviside array for vector inputs
@@ -254,6 +305,13 @@ class PaulWave(object):
         return psi
 
     def e_fold(self, s):
-        """The e-folding time for the Morlet wavelet.
+        r"""The e-folding time for the Paul wavelet.  In dimensionless
+        units of time this is :math:`s/\sqrt{2}`.
+
+        :param s:
+            scale factor of wavelet
+
+        :return tfold:
+            the e-folding time in dimensionless units
         """
         return s / _SQRT2
