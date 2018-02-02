@@ -185,9 +185,3 @@ cases.
 
 If you plan on doing several transforms or want more control to tune
 your transforms you should use a ``WaveletBasis`` object.
-
-using a ``WaveletBasis``
-------------------------
-
-
-
