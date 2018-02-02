@@ -12,32 +12,38 @@ from .wavelet import MorletWave
 
 
 class WaveletBasis(object):
-    """An object setting up a CWT basis for forward and inverse transforms
-    of data using the same sample rate and frequency scales.  At
-    initialization given N, dt, and dj, the scales will be computed from
-    the ``_get_scales`` function based on the Nyquist period of the wavelet
+    """An object containing a basis for wavelet transforms
+    
+    The basis is used for forward and inverse transforms of data using
+    the same sample rate and frequency scales.  At initialization given
+    ``N``, ``dt``, and ``dj``, the scales will be computed from the
+    ``_get_scales()`` method based on the Nyquist period of the wavelet
     and the length of the data.
+
     See T&C section 3.f for more information about how scales are choosen.
     """
     def __init__(self, wavelet=None, N=None, dt=1, dj=1/16):
-        """WaveletBasis(wavelet=MorletWave(), N=None, dt=1, dj=1/16)
+        """initialize ``WaveletBasis`` object
 
-        :param wavelet: wavelet basis function which takes two arguments.
-            First arguement is the time to evaluate the wavelet function.
-            The second is the scale or width parameter.  The wavelet
-            function should be normalized to unit weight at scale=1, and
-            have zero mean.
-        :param N: length of time domain data that will be transformed
-        :param dt: sample cadence of data, needed for normalization
-            of transforms
-        :param dj: scale step size, used to determine the scales for
-            the transform
+        :param wavelet:
+            Wavelet basis function which takes two arguments: ``t`` and
+            ``s``.  ``t`` is the time to evaluate the wavelet function.
+            ``s`` is the scale or width parameter.  The wavelet function
+            should be normalized to unit weight at scale=1, and have
+            zero mean.
+        :param N:
+            length of time domain data that will be transformed
+        :param dt:
+            sample cadence of data, needed for normalization of transforms
+        :param dj:
+            scale step size, used to determine the frequency scales to use
+            for the transform
 
-        Note that the wavelet function used here has different requirements
-        than ``scipy.signal.cwt``.  The Ricker and Morlet wavelet functions
-        provided in ``scipy.signal`` are incompatible with this function.
-        The ``MorletWave`` and ``PaulWave`` callable objects provided in
-        this module can be used, if initialized.
+        Note: the wavelet function used to generate a basis  has different
+        requirements than ``scipy.signal.cwt``.  The Ricker and Morlet
+        wavelet functions provided in ``scipy.signal`` are incompatible
+        with this function.  Instances of the ``MorletWave`` and ``PaulWave``
+        callable objects provided in ``ceedub.wavelet`` can be used.
         """
         if wavelet is None:
             wavelet = MorletWave()  # default to Morlet, w0=6
@@ -55,7 +61,13 @@ class WaveletBasis(object):
     # all are determined at creation and frozen!
     @property
     def wavelet(self):
-        """basis wavelet function"""
+        """wavelet basis function
+
+        :param t:
+            time or array of times to calculate wavelet
+        :param s:
+            scale parameter for wavelet
+        """
         return self._wavelet
 
     @property
@@ -108,17 +120,20 @@ class WaveletBasis(object):
         return self._freqs
 
     def cwt(self, tdat):
-        """cwt(tdat)
-        Computes the continuous wavelet transform of ``tdat``, using
-        the wavelet function and scales of the WaveletBasis, using FFT
-        convolution as in T&C.  The FFT convolution is performed once
-        at each wavelet scale, determining the frequecny resolution of
-        the output.
+        """compute continuous wavelet transfomrm
 
-        :param tdat: shape ``(N,)`` array of real, time domain data
-        :returns: wdat shape ``(M,N)`` array of complex, wavelet domain data.
-            ``M`` is the number of scales used in the transform, and ``N`` is
-            the length of the input time domain data.
+        :param tdat:
+            shape ``(N,)`` array of real, time domain data
+
+        :return wdat:
+            shape ``(M,N)`` array of complex, wavelet domain data.
+            ``M`` is the number of scales used in the transform, and ``N``
+            is the length of the input time domain data.
+
+        Uses the wavelet function and scales of the WaveletBasis. The
+        transform is calculated via FFT convolution as described in T&C.
+        The FFT convolution is computed once at each wavelet scale,
+        determining the frequecny resolution of the output.
         """
         if len(tdat) != self.N:
             raise ValueError("tdat is not length N={:d}".format(self.N))
@@ -144,15 +159,19 @@ class WaveletBasis(object):
         return wdat
 
     def icwt(self, wdat):
-        """icwt(wdat)
-        Coputes the inverse continuous wavelet transform of ``wdat``,
-        following T&C section 3.i.  Uses the wavelet function and scales
-        of the parent WaveletBasis.
+        """compute the inverse continuous wavelet transform
 
-        :param wdat: shape ``(M,N)`` array of complex, wavelet domain data.
-            ``M`` is the number of frequency scales, and ``N`` is the number of
-            time samples.
-        :returns: tdat shape ``(N,)`` array of real, time domain data
+        :param wdat:
+            shape ``(M,N)`` array of complex, wavelet domain data.
+            ``M`` is the number of frequency scales, and ``N`` is
+            the number of time samples.
+
+        :returns tdat:
+            shape ``(N,)`` array of real, time domain data
+
+        The inverse continuous wavelet transform is computed following
+        T&C section 3.i.  Uses the wavelet function and scales of the
+        parent WaveletBasis.
         """
         if not hasattr(self, '_recon_norm'):
             self._recon_norm = self._get_recon_norm()
@@ -166,19 +185,27 @@ class WaveletBasis(object):
         return tdat
 
     def _get_scales(self):
-        """_get_scales()
-        Returns a list of scales in log2 frequency spacing for use in cwt.
-        These are chosen such that ``s0`` is the smallest scale, ``dj`` is
-        the scale step size, and log2(N) is the number of octaves.
+        r"""determine the frequency scales used in the transform
+        
+        :return scales:
+            array of scale parameters, s, for use in ``cwt``
 
-            s_j = s0 * 2**(j*dj), j in [0,J]
-            J = log2(N) / dj
+        The frequency scales have log2 frequency spacing. They are
+        chosen such that :math:`s_0` is the 'smallest' scale, :math:`dj`
+        is the scale step size (in log-space), and :math:`\log_2(N)` is
+        the number of octaves.  Traditionally,
 
-        :returns: scales array of scale parameters, s, for use in ``cwt``
+        .. math:
+            s_j &= s_0 \cdot 2^{j\cdot dj}, \text{ for } j \in [0,J] \\
+            J &= \log_2(N) / dj
 
-        If the wavelet used contains a ``nyquist_scale()`` method, then
-        the smallest scale will correspond to the Nyquist frequency and
-        the largest will correspond to 1/(2*Tobs).
+        If the wavelet used contains a ``nyquist_scale()`` method, :math:`s_0`
+        will correspond to the Nyquist frequency.  The largest scale is
+        has a frequency given by the observation time: :math:`1/(2 T_{obs}).
+        
+        In practice the inverse transforms are more accurate when scales
+        outside of the usual Fourier frequencies are used.  We use an extra
+        eight octaves, the scales for :math:`j\in [-4, J+4]`.
         """
         N = self.N
         dj = self.dj
@@ -189,13 +216,16 @@ class WaveletBasis(object):
         return np.array(s)
 
     def _get_recon_norm(self):
-        """_get_recon_norm()
-        Computes the normalization factor for the icwt a.k.a. time domain
-        reconstruction.
-        Note this is not C_delta from T&C, this is a normalization constant
-        such that in the ICWT sum*norm = tdat. This constant eliminates
-        some factors which explicitly cancel in later calculations, for
-        example dj*dt**0.5/Psi0.
+        r"""compute the  normalization factor for ICWT
+
+        This is not :math:`C_\delta` from T&C, this is a normalization
+        constant :math:`A`, such that in the ICWT calculation
+        
+        .. math: A\, \sum_k \psi(w_k) = tdat.
+        
+        This constant eliminates some factors which explicitly cancel in
+        later calculations, for example
+        :math:`\frac{dj\cdot dt^{1/2}}{\psi_0}`.
         """
         N = self.N
         dt = self.dt
