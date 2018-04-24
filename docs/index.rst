@@ -25,7 +25,7 @@ An awesome, simple, and easy to use continuous wavelet transform package for pyt
 
    installation
    modules
-   Usage
+   usage
 
 .. toctree::
    :maxdepth: 2

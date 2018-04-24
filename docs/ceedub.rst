@@ -9,24 +9,24 @@ ceedub package
 Submodules
 ----------
 
-ceedub\.basis module
---------------------
+ceedub.basis module
+-------------------
 
 .. automodule:: ceedub.basis
     :members:
     :undoc-members:
     :show-inheritance:
 
-ceedub\.easy module
--------------------
+ceedub.easy module
+------------------
 
 .. automodule:: ceedub.easy
     :members:
     :undoc-members:
     :show-inheritance:
 
-ceedub\.wavelet module
-----------------------
+ceedub.wavelet module
+---------------------
 
 .. automodule:: ceedub.wavelet
     :members:
