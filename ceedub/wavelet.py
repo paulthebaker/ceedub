@@ -16,12 +16,12 @@ class Wavelet(object):
     """base class for wavelet objects
     """
     def __call__(self, *args, **kwargs):
-        """
-        """
+        """default to time domain"""
         return self.time(*args, **kwargs)
 
 
-class MorletWave(object):
+
+class MorletWave(Wavelet):
     """Morlet-Gabor wavelet: a Gaussian windowed sinusoid
 
     ``w0`` is the nondimensional frequency constant.  This defines
@@ -43,10 +43,6 @@ class MorletWave(object):
         self._MOD = False
         if(w0 < 5.):
             self._MOD = True
-
-    def __call__(self, *args, **kwargs):
-        """default to time domain"""
-        return self.time(*args, **kwargs)
 
     def time(self, t, s=1.0):
         r"""
@@ -178,7 +174,7 @@ class MorletWave(object):
         return _SQRT2 * s
 
 
-class PaulWave(object):
+class PaulWave(Wavelet):
     """Paul wavelet of order m.
 
     By definition ``m`` is an integer,
@@ -194,10 +190,6 @@ class PaulWave(object):
             mother wavelet.
         """
         self.m = m
-
-    def __call__(self, *args, **kwargs):
-        """default to time domain"""
-        return self.time(*args, **kwargs)
 
     def time(self, t, s=1.0):
         r"""
