@@ -143,7 +143,7 @@ class WaveletBasis(object):
         waves = [self.wavelet.freq(ws, s) for s in self.scales]
 
         wdat = np.fft.ifft(waves * fdat)  # convolution theorem
-        norms = np.sqrt(self.scales * dW)
+        norms = np.sqrt(self.scales * dW * self.N)
 
         return np.einsum('i,ij->ij', norms, wdat)
 
