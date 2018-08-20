@@ -7,7 +7,6 @@ from __future__ import (absolute_import, division,
 
 import numpy as np
 
-from scipy.signal import fftconvolve as _fftconv
 from .wavelet import MorletWave
 
 
@@ -137,26 +136,16 @@ class WaveletBasis(object):
         """
         if len(tdat) != self.N:
             raise ValueError("tdat is not length N={:d}".format(self.N))
-        dT = self.dt
-        rdT = np.sqrt(dT)
-        irs = self._inv_root_scales
 
-        wdat = np.zeros((self.M, self.N), dtype=np.complex)
+        fdat = np.fft.fft(tdat)
+        ws = 2*np.pi * np.fft.fftfreq(len(tdat), d=self.dt)
+        dW = ws[1] - ws[0]
+        waves = [self.wavelet.freq(ws, s) for s in self.scales]
 
-        for ii, s in enumerate(self.scales):
-            #try:
-            #    L = 10 * self.wavelet.e_fold(s)/dT
-            #except AttributeError:
-            #    L = 10 * s/dT
-            L = 10 * s/dT
-            if L > 2*self.N:
-                L = 2*self.N
-            ts = np.arange(-L/2, L/2) * dT  # generate wavelet data
-            norm = rdT * irs[ii]
-            wave = norm * self.wavelet(ts, s)
-            wdat[ii, :] = _fftconv(tdat, wave, mode='same')
+        wdat = np.fft.ifft(waves * fdat)  # convolution theorem
+        norms = np.sqrt(self.scales * dW)
 
-        return wdat
+        return np.einsum('i,ij->ij', norms, wdat)
 
     def icwt(self, wdat):
         """compute the inverse continuous wavelet transform
