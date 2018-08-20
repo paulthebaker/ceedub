@@ -13,7 +13,7 @@ from .wavelet import MorletWave
 
 class WaveletBasis(object):
     """An object containing a basis for wavelet transforms
-    
+
     The basis is used for forward and inverse transforms of data using
     the same sample rate and frequency scales.  At initialization given
     ``N``, ``dt``, and ``dj``, the scales will be computed from the
@@ -186,7 +186,7 @@ class WaveletBasis(object):
 
     def _get_scales(self):
         r"""determine the frequency scales used in the transform
-        
+
         :return scales:
             array of scale parameters, s, for use in ``cwt``
 
@@ -202,7 +202,7 @@ class WaveletBasis(object):
         If the wavelet used contains a ``nyquist_scale()`` method, :math:`s_0`
         will correspond to the Nyquist frequency.  The largest scale is
         has a frequency given by the observation time: :math:`1/(2 T_{obs}).
-        
+
         In practice the inverse transforms are more accurate when scales
         outside of the usual Fourier frequencies are used.  We use an extra
         eight octaves, the scales for :math:`j\in [-4, J+4]`.
@@ -220,9 +220,9 @@ class WaveletBasis(object):
 
         This is not :math:`C_\delta` from T&C, this is a normalization
         constant :math:`A`, such that in the ICWT calculation
-        
+
         .. math: A\, \sum_k \psi(w_k) = tdat.
-        
+
         This constant eliminates some factors which explicitly cancel in
         later calculations, for example
         :math:`\frac{dj\cdot dt^{1/2}}{\psi_0}`.
