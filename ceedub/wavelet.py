@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
-# wavelet.py
-"""Continuous wavelet transform and support functions
-based on Torrence and Compo 1998 (T&C)
-
-(http://paos.colorado.edu/research/wavelets/bams_79_01_0061.pdf)
+"""Wavelet base class and Morlet and Paul wavelet subclasses
 """
 
 from __future__ import (absolute_import, division,
@@ -11,296 +7,70 @@ from __future__ import (absolute_import, division,
 
 import numpy as np
 
-from scipy.signal import fftconvolve as _fftconv
 from scipy.special import gamma as _gam
 
 _SQRT2 = np.sqrt(2.)
 
 
-def cwt(tdat, dt=1):
-    """Compute the continuous wavelet transform, using the default
-    ``WaveletBasis``.
-    If you plan on doing several CWTs in the same basis you should
-    consider initializing a ``WaveletBasis`` object and using:
-    ``WaveletBasis.cwt``.
-    :param tdat: shape ``(N,)`` array of real, time domain data
-    :param dt: sample cadence of data, needed for normalization
-        of transforms
-    :returns: wdat shape ``(M,N)`` array of complex, wavelet domain data.
-        ``M`` is the number of scales used in the transform, and ``N`` is
-        the length of the input time domain data.
+class Wavelet(object):
+    """base class for wavelet objects
     """
-    WB = WaveletBasis(N=len(tdat), dt=dt)
-    return WB.cwt(tdat)
+    def __call__(self, *args, **kwargs):
+        """default to time domain"""
+        return self.time(*args, **kwargs)
 
 
-def icwt(wdat, dt=1):
-    """Compute the inverse continuous wavelet transform, using the default
-    ``WaveletBasis``.
-    If the forward transform was performed in a different basis, then this
-    function will give incorrect output!
-    If you plan on doing several ICWTs in the same basis you should seriously
-    consider initializing a ``WaveletBasis`` object and using:
-    ``WaveletBasis.cwt`` and ``WaveletBasis.icwt``.
-    :param wdat: shape ``(M,N)`` array of complex, wavelet domain data.
-        ``M`` is the number of frequency scales, and ``N`` is the number of
-        time samples.
-    :returns: tdat shape ``(N,)`` array of real, time domain data
-    """
-    WB = WaveletBasis(N=wdat.shape[1], dt=dt)
-    return WB.icwt(wdat)
 
-
-def cwtfreq(N, dt=1):
-    """Output the Fourier frequencies of the scales used in the default
-    ``WaveletBasis``.
-
-    :param N: number of time samples in the time domain data.
-    :param dt: sample cadence of data
-    returns: shape ``(M,)`` array of frequencies
-    """
-    WB = WaveletBasis(N=N, dt=dt)
-    return WB.freqs
-
-
-class WaveletBasis(object):
-    """An object setting up a CWT basis for forward and inverse transforms
-    of data using the same sample rate and frequency scales.  At
-    initialization given N, dt, and dj, the scales will be computed from
-    the ``_get_scales`` function based on the Nyquist period of the wavelet
-    and the length of the data.
-    See T&C section 3.f for more information about how scales are choosen.
-    """
-    def __init__(self, wavelet=None, N=None, dt=1, dj=1/16):
-        """WaveletBasis(wavelet=MorletWave(), N=None, dt=1, dj=1/16)
-
-        :param wavelet: wavelet basis function which takes two arguments.
-            First arguement is the time to evaluate the wavelet function.
-            The second is the scale or width parameter.  The wavelet
-            function should be normalized to unit weight at scale=1, and
-            have zero mean.
-        :param N: length of time domain data that will be transformed
-        :param dt: sample cadence of data, needed for normalization
-            of transforms
-        :param dj: scale step size, used to determine the scales for
-            the transform
-
-        Note that the wavelet function used here has different requirements
-        than ``scipy.signal.cwt``.  The Ricker and Morlet wavelet functions
-        provided in ``scipy.signal`` are incompatible with this function.
-        The ``MorletWave`` and ``PaulWave`` callable objects provided in
-        this module can be used, if initialized.
-        """
-        if wavelet is None:
-            wavelet = MorletWave()  # default to Morlet, w0=6
-        if not isinstance(N, int):
-            raise TypeError("N must be an integer")
-
-        self._wavelet = wavelet
-        self._dt = dt
-        self._dj = dj
-        self._N = N
-
-        self._inv_root_scales = 1./np.sqrt(self.scales)
-
-    # don't provide setters for properties!
-    # all are determined at creation and frozen!
-    @property
-    def wavelet(self):
-        """basis wavelet function"""
-        return self._wavelet
-
-    @property
-    def dt(self):
-        return self._dt
-
-    @property
-    def dj(self):
-        return self._dj
-
-    @property
-    def N(self):
-        return self._N
-
-    @property
-    def s0(self):
-        if not hasattr(self, '_s0'):
-            try:
-                self._s0 = self.wavelet.nyquist_scale(self.dt)
-            except AttributeError:
-                self._s0 = 2*self.dt
-        return self._s0
-
-    @property
-    def scales(self):
-        if not hasattr(self, '_scales'):
-            self._scales = self._get_scales()
-        return self._scales
-
-    @property
-    def M(self):
-        if not hasattr(self, '_M'):
-            self._M = len(self.scales)
-        return self._M
-
-    @property
-    def times(self):
-        """sample times of data"""
-        if not hasattr(self, '_times'):
-            self._times = np.arange(self.N) * self.dt
-        return self._times
-
-    @property
-    def freqs(self):
-        if not hasattr(self, '_freqs'):
-            try:
-                self._freqs = 1./self.wavelet.fourier_period(self.scales)
-            except AttributeError:
-                self._freqs = 1./self.scales
-        return self._freqs
-
-    def cwt(self, tdat):
-        """cwt(tdat)
-        Computes the continuous wavelet transform of ``tdat``, using
-        the wavelet function and scales of the WaveletBasis, using FFT
-        convolution as in T&C.  The FFT convolution is performed once
-        at each wavelet scale, determining the frequecny resolution of
-        the output.
-
-        :param tdat: shape ``(N,)`` array of real, time domain data
-        :returns: wdat shape ``(M,N)`` array of complex, wavelet domain data.
-            ``M`` is the number of scales used in the transform, and ``N`` is
-            the length of the input time domain data.
-        """
-        if len(tdat) != self.N:
-            raise ValueError("tdat is not length N={:d}".format(self.N))
-        dT = self.dt
-        rdT = np.sqrt(dT)
-        irs = self._inv_root_scales
-
-        wdat = np.zeros((self.M, self.N), dtype=np.complex)
-
-        for ii, s in enumerate(self.scales):
-            #try:
-            #    L = 10 * self.wavelet.e_fold(s)/dT
-            #except AttributeError:
-            #    L = 10 * s/dT
-            L = 10 * s/dT
-            if L > 2*self.N:
-                L = 2*self.N
-            ts = np.arange(-L/2, L/2) * dT  # generate wavelet data
-            norm = rdT * irs[ii]
-            wave = norm * self.wavelet(ts, s)
-            wdat[ii, :] = _fftconv(tdat, wave, mode='same')
-
-        return wdat
-
-    def icwt(self, wdat):
-        """icwt(wdat)
-        Coputes the inverse continuous wavelet transform of ``wdat``,
-        following T&C section 3.i.  Uses the wavelet function and scales
-        of the parent WaveletBasis.
-
-        :param wdat: shape ``(M,N)`` array of complex, wavelet domain data.
-            ``M`` is the number of frequency scales, and ``N`` is the number of
-            time samples.
-        :returns: tdat shape ``(N,)`` array of real, time domain data
-        """
-        if not hasattr(self, '_recon_norm'):
-            self._recon_norm = self._get_recon_norm()
-        M = self.M
-        N = self.N
-        if wdat.shape != (M, N):
-            raise ValueError("wdat is not shape ({0:d},{1:d})".format(M, N))
-        irs = self._inv_root_scales
-        tdat = np.einsum('ij,i->j', np.real(wdat), irs)
-        tdat *= self._recon_norm
-        return tdat
-
-    def _get_scales(self):
-        """_get_scales()
-        Returns a list of scales in log2 frequency spacing for use in cwt.
-        These are chosen such that ``s0`` is the smallest scale, ``dj`` is
-        the scale step size, and log2(N) is the number of octaves.
-
-            s_j = s0 * 2**(j*dj), j in [0,J]
-            J = log2(N) / dj
-
-        :returns: scales array of scale parameters, s, for use in ``cwt``
-
-        If the wavelet used contains a ``nyquist_scale()`` method, then
-        the smallest scale will correspond to the Nyquist frequency and
-        the largest will correspond to 1/(2*Tobs).
-        """
-        N = self.N
-        dj = self.dj
-        s0 = self.s0
-        Noct = np.log2(N)+1  # number of scale octaves
-        J = int(Noct / dj)  # total number of scales
-        s = [s0 * 2**(j * dj) for j in range(-4, J)]
-        return np.array(s)
-
-    def _get_recon_norm(self):
-        """_get_recon_norm()
-        Computes the normalization factor for the icwt a.k.a. time domain
-        reconstruction.
-        Note this is not C_delta from T&C, this is a normalization constant
-        such that in the ICWT sum*norm = tdat. This constant eliminates
-        some factors which explicitly cancel in later calculations, for
-        example dj*dt**0.5/Psi0.
-        """
-        N = self.N
-        dt = self.dt
-        scales = self.scales
-        Psi_f = self.wavelet.freq  # f-domain wavelet as f(w_k, s)
-        w_k = 2*np.pi * np.fft.rfftfreq(N, dt)  # Fourier freqs
-
-        W_d = np.zeros_like(scales)
-        for ii, sc in enumerate(scales):
-            norm = np.sqrt(2*np.pi / dt)
-            W_d[ii] = np.sum(Psi_f(w_k, s=sc).conj()) * norm
-        W_d /= N
-        return 1/np.sum(np.real(W_d))
-
-
-class MorletWave(object):
+class MorletWave(Wavelet):
     """Morlet-Gabor wavelet: a Gaussian windowed sinusoid
-    w0 is the nondimensional frequency constant.  This defines
+
+    ``w0`` is the nondimensional frequency constant.  This defines
     the base frequency and width of the mother wavelet. For
-    small w0 the wavelets have non-zero mean. T&C set this to
+    small ``w0`` the wavelets have non-zero mean. T&C set ``w0`` to
     6 by default.
-    If w0 is set to less than 5, the modified Morlet wavelet with
-    better low w0 behavior is used instead.
+    If ``w0`` is set to less than 5, the modified Morlet wavelet with
+    better low ``w0`` behavior is used instead.
     """
 
     def __init__(self, w0=6):
-        """initialize Morlet-Gabor wavelet with frequency constant w0
+        """initialize Morlet-Gabor wavelet
+
+        :param w0:
+            Frequency constant defining width and base frequency of
+            mother wavelet.
         """
         self.w0 = w0
         self._MOD = False
         if(w0 < 5.):
             self._MOD = True
 
-    def __call__(self, *args, **kwargs):
-        """default to time domain"""
-        return self.time(*args, **kwargs)
-
     def time(self, t, s=1.0):
-        """
+        r"""
         Time domain complex Morlet wavelet, centered at zero.
 
-        :param t: time
-        :param s: scale factor
-        :return psi: value of complex morlet wavelet at time, t
+        :param t:
+            time or list of times to calculate wavelet
+        :param s:
+            scale factor of wavelet (defines which frequency scale)
 
-        The wavelets are defined by dimensionless time: x = t/s
+        :return psi:
+            value of complex morlet wavelet at given times
 
-        For w0 >= 5, computes the standard Morlet wavelet:
-            psi(x) = pi**-0.25 * exp(1j*w0*x) * exp(-0.5*(x**2))
+        The wavelets are defined by dimensionless time: :math:`x = t/s`.
+        For :math:`w_0 \ge 5`, the standard Morlet-Gabor wavelet is used,
+        and for :math`w_0<5`, the modified Morlet-Gabor is used for better
+        stability.
 
-        For w0 < 5, computes the modified Morlet wavelet:
-            psi(x) = pi**-0.25 *
-                        (exp(1j*w0*x) - exp(-0.5*(x**2))) * exp(-0.5*(x**2))
+        .. math:: \psi(x) =
+                \Biggl \lbrace
+                {
+                \pi^{-1/4}\, \exp(i\, w_0\, x)\, \exp(-x^2/2),
+                    \text{ for }{w_0 \ge 5}
+                \atop
+                \pi^{-1/4}\,
+                    \left[\exp(i\, w_0\, x) - \exp(-x^2/2)\right] \exp(-x^2/2),
+                    \text{ for }{w_0 \lt 5}
+                }
         """
         t = np.asarray(t)
         w0 = self.w0
@@ -315,36 +85,73 @@ class MorletWave(object):
         return psi
 
     def fourier_period(self, s):
-        """The Fourier period of the Morlet wavelet with scale, s, given by:
-            P = 4*pi*s / (w0 + sqrt(2 + w0**2))
+        r"""compute Fourier period of the Morlet wavelet
+
+        :param s:
+            scale factor of wavelet
+
+        :return period:
+            period of wavelet
+
+        For a wavelet with scale, :math:`s`, the period is:
+
+        .. math:: P = \frac{4\pi\, s}{w_0 + \sqrt{2 + {w_0}^2}}.
         """
         w0 = self.w0
         return 4*np.pi*s / (w0 + np.sqrt(2 + w0**2))
 
     def nyquist_scale(self, dt=1):
-        """s0 corresponding to the Nyquist period of wavelet
-            s0 = 2*dt * (w0 + sqrt(2 + w0**2)) / (4*pi)
-        for large w0 this is approximately dt*w0/pi
+        r"""compute the scale factor corresponding to the Nyquist period
+
+        :param dt:
+            sample cadence of wavelet basis (time between samples)
+
+        For wavelet basis defined by the mother wavelet with width,
+        :math:`w_0`, and a sample cadence, :math:`dt`, the Nyquist period
+        is the smallest period (largest frequency) which can be resolved.
+        For a Morlet wavelet this is
+
+        .. math:: s_0 = 2\,dt\,\frac{w_0 + \sqrt{2 + {w_0}^2}}{4\pi}
+
+        for large :math:`w_0` this is approximately
+        :math:`dt\cdot w_0/\pi`.
         """
         w0 = self.w0
         return dt * (w0 + np.sqrt(2 + w0**2)) / (2*np.pi)
 
     def freq(self, w, s=1.0):
-        """
-        Frequency domain representation of Morlet wavelet
-        Note that the complex Morlet wavelet is real in the frequency domain.
-        :param w: frequency
-        :param s: scale factor
-        :return psi: value of morlet wavelet at frequency, w
+        r"""Frequency domain representation of Morlet wavelet
 
-        Note there is no support for modified Morlet wavelets. The
-        wavelets are defined by dimensionless frequency: y = w*s
+        :param w:
+            frequency :math:`\omega` or list of frequencies to calculate
+            wavelet
+        :param s:
+            scale factor
 
-        The standard Morlet wavelet is computed as:
-            psi(y) = pi**-.25 * H(y) * exp((-(y-w0)**2) / 2)
+        :return psi:
+            value of morlet wavelet at frequency
 
-        where H(y) is the Heaviside step function:
-            H(y) = (y > 0) ? 1:0
+        The wavelets are defined by dimensionless frequency:
+        :math:`y = \omega\cdot s`.  The complex Morlet wavelet is real
+        in the frequency domain.  The standard Morlet wavelet is
+        defined in the frequency domain as:
+
+        .. math::
+            \bar\psi(y) = \pi^{-1/4}\, \mathcal{H}(y)\,
+                \exp\left(-\frac{(y-w_0)^2}{2}\right)
+
+        where :math:`\mathcal{H}(y)` is the Heaviside step function:
+
+        .. math::
+            \mathcal{H}(y) =
+                \Biggl \lbrace
+                {
+                1, \text{ for } y \gt 0
+                \atop
+                0, \text{ for } y \le 0
+                }
+
+        There is currently no support for modified Morlet wavelets!
         """
         w = np.asarray(w)
         H = np.zeros_like(w)  # Heaviside array for vector inputs
@@ -355,37 +162,53 @@ class MorletWave(object):
         return H * np.pi**-.25 * np.exp(0.5 * (-(y - w0)**2))
 
     def e_fold(self, s):
-        """The e-folding time for the Morlet wavelet.
+        r"""The e-folding time for the Morlet wavelet.  In dimensionless
+        units of time this is :math:`\sqrt{2}\cdot s`.
+
+        :param s:
+            scale factor of wavelet
+
+        :return tfold:
+            the e-folding time in dimensionless units
         """
         return _SQRT2 * s
 
 
-class PaulWave(object):
+class PaulWave(Wavelet):
     """Paul wavelet of order m.
-    By definition m is an integer, however in this implementation
-    gamma functions are used in place of factorials, so non-integer
-    values of m won't cause errors.
+
+    By definition ``m`` is an integer,
+    however this implementation uses gamma functions in place
+    of factorials, so non-integer values of ``m`` won't cause erros.
     """
 
     def __init__(self, m=4):
-        """ initialize Paul wavelet of order m.
+        """initialize Paul wavelet
+
+        :param m:
+            wavelet order which defines width and base frequency of
+            mother wavelet.
         """
         self.m = m
 
-    def __call__(self, *args, **kwargs):
-        """default to time domain"""
-        return self.time(*args, **kwargs)
-
     def time(self, t, s=1.0):
-        """
+        r"""
         Time domain complex Paul wavelet, centered at zero.
-        :param t: time
-        :param s: scale factor
-        :returns psi: value of complex Paul wavelet at time, t
 
-        The wavelets are defined by dimensionless time: x = t/s
+        :param t:
+            time or list of times to calculate wavelet
+        :param s:
+            scale factor of wavelet (defines which frequency scale)
 
-            psi(x) = (2*1j)**m * m! / (pi*(2m)!) * (1 - 1j*x)**-(m+1)
+        :return psi:
+            value of complex Paul wavelet at given times
+
+        The wavelets are defined by dimensionless time: :math:`x = t/s`.
+
+        .. math::
+            \psi(x) = \frac{(2i)^m \cdot m!}{\pi\cdot (2m)!}
+                \cdot (1 - ix)^{-(m+1)}
+
         """
         t = np.asarray(t)
         m = self.m
@@ -396,34 +219,71 @@ class PaulWave(object):
         return psi
 
     def fourier_period(self, s):
-        """The Fourier period of the Paul wavelet given by:
-            P = 4*pi*s / (2*m + 1)
+        r"""compute Fourier period of the Paul wavelet
+
+        :param s:
+            scale factor of wavelet
+
+        :return period:
+            period of wavelet
+
+        For a wavelet with scale, :math:`s`, the period is:
+
+        .. math:: P = \frac{4\pi\, s}{2m + 1}
         """
         m = self.m
         return 4*np.pi*s / (2*m + 1)
 
     def nyquist_scale(self, dt=1):
-        """s0 corresponding to the Nyquist period of wavelet
-            s0 = 2*dt (2*m + 1)/(4*pi)
+        r"""compute the scale factor corresponding to the Nyquist period
+
+        :param dt:
+            sample cadence of wavelet basis (time between samples)
+
+        For wavelet basis defined by the mother wavelet of order,
+        :math:`m`, and a sample cadence, :math:`dt`, the Nyquist period
+        is the smallest period (largest frequency) which can be resolved.
+        For a Paul wavelet this is
+
+        .. math:: s_0 = 2\,dt\, \frac{2m + 1}{4\pi}
+        
+        for large :math:`m` this is approximately
+        :math:`dt\cdot m/\pi`.
         """
         m = self.m
         return dt * (2*m+1)/(2*np.pi)
 
     def freq(self, w, s=1.0):
-        """
-        Frequency domain representation of Paul wavelet
-        Note that the complex Paul wavelet is real in the frequency domain.
-        :param w: frequency
-        :param s: scale factor
-        :returns psi: value of morlet wavelet at frequency, w
+        r"""Frequency domain representation of Paul wavelet
 
-        wavelets are defined by dimensionless frequency: y = w*s
+        :param w:
+            frequency :math:`\omega` or list of frequencies to calculate
+            wavelet
+        :param s:
+            scale factor
 
-        The Paul wavelet is computed as:
-            psi(y) = 2**m / np.sqrt(m * (2*m-1)!) * H(y) * (y)**m * exp(-y)
+        :return psi:
+            value of morlet wavelet at frequency
 
-        where H(y) is the Heaviside step function:
-            H(y) = (y > 0) ? 1:0
+        The wavelets are defined by dimensionless frequency:
+        :math:`y = \omega\cdot s`.  The complex Paul wavelet is real
+        in the frequency domain.  The standard Paul wavelet is
+        defined in the frequency domain as:
+
+        .. math::
+            \bar\psi(y) = \frac{2^m}{\sqrt{m\cdot (2m-1)!}}\,
+                H(y)\, y^m\, \exp(-y)
+
+        where :math:`\mathcal{H}(y)` is the Heaviside step function:
+
+        .. math::
+            \mathcal{H}(y) =
+                \Biggl \lbrace
+                {
+                1, \text{ for } y \gt 0
+                \atop
+                0, \text{ for } y \le 0
+                }
         """
         w = np.asarray(w)
         H = np.zeros_like(w)  # Heaviside array for vector inputs
@@ -437,6 +297,13 @@ class PaulWave(object):
         return psi
 
     def e_fold(self, s):
-        """The e-folding time for the Morlet wavelet.
+        r"""The e-folding time for the Paul wavelet.  In dimensionless
+        units of time this is :math:`s/\sqrt{2}`.
+
+        :param s:
+            scale factor of wavelet
+
+        :return tfold:
+            the e-folding time in dimensionless units
         """
         return s / _SQRT2

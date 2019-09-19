@@ -40,7 +40,16 @@ import ceedub
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.viewcode']
+extensions = ['sphinx.ext.autodoc', 'sphinx.ext.viewcode', 'sphinx.ext.mathjax']
+
+# mathjax location
+mathjax_path = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML'
+
+# get doctrings for __init__ method
+autoclass_content = 'both'
+
+# make order or docs 'groupwise'
+autodoc_member_order = 'groupwise'
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -56,7 +65,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'ceedub'
-copyright = u"2017, Paul T. Baker"
+copyright = u"2017-2018, Paul T. Baker"
 
 # The version info for the project you're documenting, acts as replacement
 # for |version| and |release|, also used in various other places throughout
@@ -111,7 +120,7 @@ pygments_style = 'sphinx'
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'default'
+html_theme = 'sphinx_rtd_theme'
 
 # Theme options are theme-specific and customize the look and feel of a
 # theme further.  For a list of options available for each theme, see the
@@ -273,3 +282,26 @@ texinfo_documents = [
 
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 #texinfo_no_detailmenu = False
+
+
+# -- Allows readthedocs to auto-generate docs --------------------------
+
+import subprocess
+def run_apidoc(_):
+    output_path = os.path.abspath(os.path.dirname(__file__))
+    # make docs from notebooks
+    #nb = '_static/notebooks/*.ipynb'
+    #subprocess.check_call(['jupyter nbconvert --template nb-rst.tpl --to rst',
+#                           nb, '--output-dir', output_path])
+
+    modules = ['../ceedub']
+    for module in modules:
+        cmd_path = 'sphinx-apidoc'
+        if hasattr(sys, 'real_prefix'):  # Check to see if we are in a virtualenv
+            # If we are, assemble the path manually
+            cmd_path = os.path.abspath(os.path.join(sys.prefix, 'bin', 'sphinx-apidoc'))
+        subprocess.check_call([cmd_path, '-o', output_path, '-f', '-M', module])
+
+def setup(app):
+    app.connect('builder-inited', run_apidoc)
+

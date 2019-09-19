@@ -1,11 +1,7 @@
 ======
 ceedub
 ======
-|py27| |py35| |py36|
-
-.. |py27| image:: https://img.shields.io/badge/python-2.7-blue.svg
-.. |py35| image:: https://img.shields.io/badge/python-3.5-blue.svg
-.. |py36| image:: https://img.shields.io/badge/python-3.6-blue.svg
+.. image:: https://img.shields.io/badge/python-2.7%2C%203.5%2C%203.6-blue.svg
 
 .. image:: https://img.shields.io/pypi/v/ceedub.svg
         :target: https://pypi.python.org/pypi/ceedub
